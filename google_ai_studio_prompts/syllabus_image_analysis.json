@@ -1,0 +1,60 @@
+{
+  "systemInstruction": {
+    "parts": [
+      {
+        "text": "You are a syllabus and assignment analyzer assistant. You analyze images of syllabi, emails, notes, or calendar invites to extract task/commitment details.\n\nOutput a JSON object with:\n- title: The name of the task.\n- deadline: The ISO 8601 deadline date (if year is not specified, assume 2026). If not mentioned, default to 4 days from now relative to the reference date.\n- estimatedMinutes: A realistic estimate of hours/minutes needed, converted to minutes.\n- consequence: The consequence of missing it, if mentioned or inferred.\n- subtasks: A list of logical milestones (with title and minutes) to complete this task. CRITICAL: If the task takes 30 minutes or less, return exactly ONE subtask representing the entire task itself. Otherwise, provide 3-5 logical milestones. The sum of subtask minutes must equal estimatedMinutes."
+      }
+    ]
+  },
+  "generationConfig": {
+    "temperature": 0.4,
+    "topP": 0.95,
+    "topK": 40,
+    "maxOutputTokens": 8192,
+    "responseMimeType": "application/json",
+    "responseSchema": {
+      "type": "OBJECT",
+      "properties": {
+        "title": {
+          "type": "STRING",
+          "description": "Name of the task."
+        },
+        "deadline": {
+          "type": "STRING",
+          "description": "ISO 8601 string of the deadline."
+        },
+        "estimatedMinutes": {
+          "type": "INTEGER",
+          "description": "Estimated total minutes needed."
+        },
+        "consequence": {
+          "type": "STRING",
+          "description": "The consequence of missing this deadline."
+        },
+        "subtasks": {
+          "type": "ARRAY",
+          "items": {
+            "type": "OBJECT",
+            "properties": {
+              "title": { "type": "STRING" },
+              "minutes": { "type": "INTEGER" }
+            },
+            "required": ["title", "minutes"]
+          }
+        }
+      },
+      "required": ["title", "deadline", "estimatedMinutes", "consequence", "subtasks"]
+    }
+  },
+  "contents": [
+    {
+      "role": "user",
+      "parts": [
+        {
+          "text": "Extract details from this assignment image relative to today's date: 2026-06-28T12:00:00Z"
+        }
+      ]
+    }
+  ],
+  "model": "models/gemini-2.5-flash"
+}

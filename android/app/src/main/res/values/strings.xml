@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">ClutchAI</string>
+    <string name="title_activity_main">ClutchAI</string>
+    <string name="package_name">com.clutchai.app</string>
+    <string name="custom_url_scheme">com.clutchai.app</string>
+</resources>

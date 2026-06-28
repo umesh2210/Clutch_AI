@@ -1,0 +1,69 @@
+{
+  "systemInstruction": {
+    "parts": [
+      {
+        "text": "You are a task analysis assistant. Parse the natural language commitment from a user.\n\nAnalyze the task to output a JSON object representing the structured task with the properties defined in the schema.\n- title: A concise, action-oriented name of the task.\n- deadline: An ISO 8601 string of when it's due. Interpret terms relative to the reference date provided in the prompt. If no deadline is specified, default to 4 days from now.\n- estimatedMinutes: Estimate the realistic time needed to complete this task in minutes based on its difficulty.\n- consequence: A short, compelling sentence detailing what is at stake if the deadline is missed.\n- subtasks: An array of logical milestones. CRITICAL: If the task is simple and takes 30 minutes or less, return exactly ONE subtask representing the entire task itself. Only if the task is complex or longer than 30 minutes, break it down into 3-5 logical, bite-sized milestones. Each subtask must have a title and minutes. The sum of these minutes MUST equal the overall estimatedMinutes."
+      }
+    ]
+  },
+  "generationConfig": {
+    "temperature": 0.2,
+    "topP": 0.95,
+    "topK": 40,
+    "maxOutputTokens": 8192,
+    "responseMimeType": "application/json",
+    "responseSchema": {
+      "type": "OBJECT",
+      "properties": {
+        "title": {
+          "type": "STRING",
+          "description": "A concise, action-oriented name of the task."
+        },
+        "deadline": {
+          "type": "STRING",
+          "description": "ISO 8601 string of the deadline."
+        },
+        "estimatedMinutes": {
+          "type": "INTEGER",
+          "description": "Total estimated minutes required for the task."
+        },
+        "consequence": {
+          "type": "STRING",
+          "description": "Short, high-stakes consequence of missing the deadline."
+        },
+        "subtasks": {
+          "type": "ARRAY",
+          "description": "Bite-sized milestones breakdown. Sum of minutes must equal estimatedMinutes.",
+          "items": {
+            "type": "OBJECT",
+            "properties": {
+              "title": { "type": "STRING" },
+              "minutes": { "type": "INTEGER" }
+            },
+            "required": ["title", "minutes"]
+          }
+        }
+      },
+      "required": ["title", "deadline", "estimatedMinutes", "consequence", "subtasks"]
+    }
+  },
+  "contents": [
+    {
+      "role": "user",
+      "parts": [
+        {
+          "text": "Parse task: DBMS Homework due tomorrow evening. Takes about 2 hours.\nReference current date/time: 2026-06-28T12:00:00Z"
+        }
+      ]
+    },
+    {
+      "role": "model",
+      "parts": [
+        {
+          "text": "{\n  \"title\": \"DBMS Homework\",\n  \"deadline\": \"2026-06-29T18:00:00.000Z\",\n  \"estimatedMinutes\": 120,\n  \"consequence\": \"Missing this assignment drops your homework grade and puts your syllabus understanding at risk.\",\n  \"subtasks\": [\n    {\n      \"title\": \"Review lecture notes & setup environment\",\n      \"minutes\": 30\n    },\n    {\n      \"title\": \"Write and test SQL queries\",\n      \"minutes\": 60\n    },\n    {\n      \"title\": \"Submit assignment files\",\n      \"minutes\": 30\n    }\n  ]\n}"
+        }
+      ]
+    }
+  ],
+  "model": "models/gemini-2.5-flash"
+}
